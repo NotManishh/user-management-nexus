@@ -1,9 +1,9 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
-const User = require('../models/user'); // Note the double dots ..
+const User = require('../models/user');
 
 const app = express();
 
@@ -11,17 +11,14 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// MongoDB Connection Logic for Serverless
-// We check if we are already connected to prevent multiple connections in serverless
+// MongoDB Connection Logic for Vercel Serverless
 if (mongoose.connection.readyState === 0) {
     mongoose.connect(process.env.MONGO_URI)
         .then(() => console.log('✅ Connected to MongoDB Atlas'))
         .catch(err => console.error('❌ MongoDB Connection Error:', err));
 }
 
-// --- API ROUTES ---
-
-// Create
+// API Routes
 app.post('/api/users', async (req, res) => {
     try {
         const user = new User(req.body);
@@ -32,7 +29,6 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// Read
 app.get('/api/users', async (req, res) => {
     try {
         const users = await User.find();
@@ -42,7 +38,6 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-// Update
 app.put('/api/users/:id', async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
@@ -52,7 +47,6 @@ app.put('/api/users/:id', async (req, res) => {
     }
 });
 
-// Delete
 app.delete('/api/users/:id', async (req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id);
@@ -62,6 +56,11 @@ app.delete('/api/users/:id', async (req, res) => {
     }
 });
 
-// IMPORTANT: Do NOT use app.listen() for Vercel. 
-// Vercel handles the server execution.
+// For local testing:
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = 5000;
+    app.listen(PORT, () => console.log(`🚀 Local Server: http://localhost:${PORT}`));
+}
+
+// Required for Vercel
 module.exports = app;
