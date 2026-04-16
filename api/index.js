@@ -29,6 +29,16 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
+// --- NEW CODE: Serve Frontend ---
+// Tell Express where the public folder is located
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Explicitly send the index.html when someone visits the root '/'
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+// --------------------------------
+
 app.get('/api/users', async (req, res) => {
     try {
         const users = await User.find();
