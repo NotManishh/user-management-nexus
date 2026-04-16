@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Intelligence System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c084fc;
+            --secondary: #6366f1;
+            --bg: #030712;
+            --glass: rgba(17, 24, 39, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #f3f4f6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Interactive Cursor Glow */
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Custom Cursor Dot */
+        #cursor-dot {
+            position: fixed;
+            width: 8px; height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .container { max-width: 1100px; margin: 80px auto; padding: 0 20px; position: relative; }
+
+        header h1 {
+            font-size: 4rem; font-weight: 800; text-align: center;
+            letter-spacing: -2px; margin-bottom: 10px;
+            background: linear-gradient(to bottom right, #fff 30%, var(--primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Cyber Form */
+        .cyber-card {
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 50px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .input-group { position: relative; margin-bottom: 25px; }
+        
+        input, textarea {
+            width: 100%; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 18px; color: white; font-size: 1rem;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input:focus { 
+            border-color: var(--primary); 
+            background: rgba(255,255,255,0.07);
+            box-shadow: 0 0 20px rgba(192, 132, 252, 0.2);
+        }
+
+        .btn-init {
+            width: 100%; padding: 20px; border-radius: 16px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white; font-weight: 800; border: none;
+            text-transform: uppercase; letter-spacing: 2px;
+            transition: 0.3s; margin-top: 20px;
+        }
+
+        .btn-init:hover { transform: scale(1.02); filter: brightness(1.2); }
+
+        /* Records Display */
+        .records-title { margin: 80px 0 40px; font-size: 2rem; text-align: center; }
+        
+        .user-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+
+        .user-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 24px; padding: 30px;
+            transition: 0.5s ease;
+        }
+
+        .user-card:hover {
+            background: rgba(192, 132, 252, 0.05);
+            border-color: var(--primary);
+            transform: translateY(-10px);
+        }
+
+        .user-card h3 { font-size: 1.5rem; margin-bottom: 8px; color: #fff; }
+        .user-card p { color: #9ca3af; font-size: 0.95rem; line-height: 1.6; }
+
+    </style>
+</head>
+<body>
+
+    <div id="cursor-glow"></div>
+    <div id="cursor-dot"></div>
+
+    <div class="container">
+        <header>
+            <h1>NEXUS.OS</h1>
+            <p style="text-align: center; color: var(--primary); font-weight: 600; letter-spacing: 4px; margin-bottom: 50px;">DATABASE MANAGEMENT CORE</p>
+        </header>
+
+        <div class="cyber-card">
+            <form id="userForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <input type="hidden" id="mongoId">
+                <div class="input-group"><input type="text" id="name" placeholder="Full Name" required minlength="3"></div>
+                <div class="input-group"><input type="email" id="email" placeholder="Identity Email" required></div>
+                <div class="input-group"><input type="number" id="age" placeholder="Age" min="0" max="120"></div>
+                <div class="input-group"><input type="text" id="userId" placeholder="Unique Access ID" required></div>
+                <div class="input-group" style="grid-column: span 2;"><input type="text" id="hobbies" placeholder="Areas of Expertise (Hobbies)"></div>
+                <div class="input-group" style="grid-column: span 2;"><textarea id="bio" rows="3" placeholder="Biometric Description..."></textarea></div>
+                <div style="grid-column: span 2;">
+                    <button type="submit" id="submitBtn" class="btn-init">Synchronize Data</button>
+                </div>
+            </form>
+        </div>
+
+        <h2 class="records-title">Stored Intelligence</h2>
+        <div id="userList" class="user-grid"></div>
+    </div>
+
+    <script>
+        // Custom Cursor Logic
+        const glow = document.getElementById('cursor-glow');
+        const dot = document.getElementById('cursor-dot');
+        
+        window.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+        });
+
+        const API = '/api/users';
+        const form = document.getElementById('userForm');
+
+        async function fetchUsers() {
+            const res = await fetch(API);
+            const users = await res.json();
+            document.getElementById('userList').innerHTML = users.map(u => `
+                <div class="user-card">
+                    <h3>${u.name}</h3>
+                    <div style="color: var(--primary); font-size: 0.8rem; font-weight: 800; margin-bottom: 15px;">${u.email}</div>
+                    <p>${u.bio || 'No profile data available.'}</p>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button onclick="editUser('${u._id}', '${u.name}', '${u.email}', ${u.age}, '${u.hobbies.join(',')}', '${u.bio}', '${u.userId}')" style="background: none; border: 1px solid var(--border); color: #fff; padding: 5px 12px; border-radius: 8px;">Edit</button>
+                        <button onclick="deleteUser('${u._id}')" style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 5px 12px; border-radius: 8px;">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('mongoId').value;
+            const body = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                age: document.getElementById('age').value,
+                userId: document.getElementById('userId').value,
+                hobbies: document.getElementById('hobbies').value.split(','),
+                bio: document.getElementById('bio').value
+            };
+            const method = id ? 'PUT' : 'POST';
+            await fetch(id ? `${API}/${id}` : API, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            form.reset();
+            document.getElementById('mongoId').value = '';
+            document.getElementById('submitBtn').innerText = 'Synchronize Data';
+            fetchUsers();
+        };
+
+        async function deleteUser(id) { if(confirm('Delete record?')) { await fetch(`${API}/${id}`, {method:'DELETE'}); fetchUsers(); } }
+
+        function editUser(id, n, e, a, h, b, uid) {
+            document.getElementById('mongoId').value = id;
+            document.getElementById('name').value = n;
+            document.getElementById('email').value = e;
+            document.getElementById('age').value = a;
+            document.getElementById('hobbies').value = h;
+            document.getElementById('bio').value = b;
+            document.getElementById('userId').value = uid;
+            document.getElementById('submitBtn').innerText = 'Update Intelligence';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        fetchUsers();
+    </script>
+</body>
+</html>
